@@ -1,26 +1,32 @@
 import { Request, Response } from "express";
 
-export function handlerValidateChirp(req: Request, res: Response) {
-  try {
-    let content = "";
-
-    req.on("data", (chunk) => {
-      content += chunk;
-    });
-
-    req.on("end", () => {
-      try {
-        const chirp = JSON.parse(content);
-        if (chirp.body.length > 140) {
-          res.status(400).json({ error: "Chirp is too long" });
-        } else {
-          res.status(200).json({ valid: true });
-        }
-      } catch (error) {
-        res.status(400).send("Invalid JSON");
+function maskProfanity(message: string) {
+  const PROFANITIES = ["kerfuffle", "sharbert", "fornax"];
+  return message
+    .split(" ")
+    .map((word) => {
+      if (PROFANITIES.includes(word.toLowerCase())) {
+        return "****";
       }
-    });
-  } catch (error) {
-    res.status(400).json({ error: "Something went wrong" });
+      return word;
+    })
+    .join(" ");
+}
+
+function validateLength(message: string) {
+  return message.length <= 140;
+}
+
+export function handlerValidateChirp(req: Request, res: Response) {
+  if (!req.body) {
+    return res.status(400).json({ error: "Invalid JSON" });
   }
+
+  let chirp = req.body.body;
+  if (!validateLength(chirp)) {
+    return res.status(400).json({ error: "Chirp is too long" });
+  }
+
+  chirp = maskProfanity(chirp);
+  return res.status(200).json({ cleanedBody: chirp });
 }
