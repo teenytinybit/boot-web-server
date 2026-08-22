@@ -1,13 +1,15 @@
 import express from "express";
-import { handlerReadiness } from "./handlers/readiness";
 import { middlewareLogResponses } from "./middleware/logger";
+import { middlewareMetricsInc } from "./middleware/metrics";
+import apiRouter from "./routes/api";
+import adminRouter from "./routes/admin";
 
 const app = express();
 const port = 8080;
 
-app.use("/app", express.static("./src/app"));
-
-app.get("/healthz", handlerReadiness);
+app.use("/app", middlewareMetricsInc, express.static("./src/app"));
+app.use("/api", apiRouter);
+app.use("/admin", adminRouter);
 app.use(middlewareLogResponses);
 
 app.listen(port, () => {
