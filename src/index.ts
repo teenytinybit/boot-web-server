@@ -3,6 +3,7 @@ import { middlewareLogResponses } from "./middleware/logger";
 import { middlewareMetricsInc } from "./middleware/metrics";
 import adminRouter from "./routes/admin";
 import apiRouter from "./routes/api";
+import { ChirpValidationError, NotFoundError } from "./errors";
 
 const app = express();
 const port = 8080;
@@ -15,6 +16,11 @@ app.use(middlewareLogResponses);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.log(err.stack);
+  if (err instanceof NotFoundError) {
+    return res.status(404).json({ error: err.message });
+  } else if (err instanceof ChirpValidationError) {
+    return res.status(400).json({ error: err.message });
+  }
   res.status(500).json({ error: "Something went wrong on our end" });
 });
 

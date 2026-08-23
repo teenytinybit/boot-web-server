@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { ChirpValidationError } from "../errors";
 
 function maskProfanity(message: string) {
   const PROFANITIES = ["kerfuffle", "sharbert", "fornax"];
@@ -24,7 +25,7 @@ export async function handlerValidateChirp(req: Request, res: Response) {
 
   let chirp = req.body.body;
   if (!validateLength(chirp)) {
-    throw new Error("Chirp is too long");
+    throw new ChirpValidationError();
   }
 
   chirp = maskProfanity(chirp);
