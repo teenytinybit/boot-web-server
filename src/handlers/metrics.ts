@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import config from "../config";
+import config from "../config.js";
 
 export function handlerMetrics(req: Request, res: Response) {
   res.set("Content-Type", "text/html").set("charset", "utf-8");

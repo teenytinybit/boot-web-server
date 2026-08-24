@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
-import { middlewareLogResponses } from "./middleware/logger";
-import { middlewareMetricsInc } from "./middleware/metrics";
-import adminRouter from "./routes/admin";
-import apiRouter from "./routes/api";
-import { ChirpValidationError, NotFoundError } from "./errors";
+import { middlewareLogResponses } from "./middleware/logger.js";
+import { middlewareMetricsInc } from "./middleware/metrics.js";
+import adminRouter from "./routes/admin.js";
+import { ChirpValidationError, NotFoundError } from "./errors.js";
+import apiRouter from "./routes/api.js";
 
 const app = express();
 const port = 8080;

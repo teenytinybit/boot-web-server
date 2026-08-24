@@ -1,5 +1,5 @@
 import express from "express";
-import { handlerMetrics, handlerMetricsReset } from "../handlers/metrics";
+import { handlerMetrics, handlerMetricsReset } from "../handlers/metrics.js";
 
 const adminRouter = express.Router();
 

@@ -1,6 +1,6 @@
 import express from "express";
-import { handlerReadiness } from "../handlers/readiness";
-import { handlerValidateChirp } from "../handlers/validateChirp";
+import { handlerReadiness } from "../handlers/readiness.js";
+import { handlerValidateChirp } from "../handlers/validateChirp.js";
 
 const apiRouter = express.Router();
 

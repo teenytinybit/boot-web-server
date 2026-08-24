@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ChirpValidationError } from "../errors";
+import { ChirpValidationError } from "../errors.js";
 
 function maskProfanity(message: string) {
   const PROFANITIES = ["kerfuffle", "sharbert", "fornax"];
