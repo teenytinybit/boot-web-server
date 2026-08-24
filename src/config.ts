@@ -10,6 +10,7 @@ type DBConfig = {
 
 type APIConfig = {
   fileserverHits: number;
+  platform: string;
 };
 
 type Config = {
@@ -17,7 +18,7 @@ type Config = {
   db: DBConfig;
 };
 
-const apiConfig: APIConfig = { fileserverHits: 0 };
+const apiConfig: APIConfig = { fileserverHits: 0, platform: envOrThrow("PLATFORM") };
 const migrationConfig: MigrationConfig = { migrationsFolder: "./src/db/migrations" };
 
 const config: Config = {

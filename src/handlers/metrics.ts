@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import config from "../config.js";
+import { resetUsers } from "../db/queries/users.js";
 
 export function handlerMetrics(req: Request, res: Response) {
   res.set("Content-Type", "text/html").set("charset", "utf-8");
@@ -11,8 +12,14 @@ export function handlerMetrics(req: Request, res: Response) {
 </html>`);
 }
 
-export function handlerMetricsReset(req: Request, res: Response) {
+export async function handlerReset(req: Request, res: Response) {
+  if (config.api.platform !== "dev") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  await resetUsers();
   config.api.fileserverHits = 0;
+
   res.set("Content-Type", "text/plain").set("charset", "utf-8");
-  res.status(200).send("OK");
+  return res.status(200).send("OK");
 }
