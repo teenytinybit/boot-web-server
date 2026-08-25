@@ -1,16 +1,31 @@
 import { Request, Response } from "express";
-import { createUser } from "../db/queries/users.js";
+import { createUser, getUserByEmail } from "../db/queries/users.js";
+import { checkPasswordHash, hashPassword } from "../auth.js";
+import { User } from "../db/schema.js";
+
+function stripPassword(user: User): Omit<User, "hashedPassword"> {
+  const { hashedPassword, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+}
 
 export async function handlerCreateUser(req: Request, res: Response) {
-  if (!req.body) {
-    return res.status(400).json({ error: "Invalid JSON" });
-  }
+  const hash = await hashPassword(req.body.password);
+  const user = await createUser({
+    email: req.body.email,
+    hashedPassword: hash,
+  });
 
-  const email = req.body.email;
-  if (!email) {
-    return res.status(400).json({ error: "Invalid email" });
-  }
+  return res.status(201).json(stripPassword(user));
+}
 
-  const user = await createUser({ email });
-  return res.status(201).json(user);
+export async function handlerLogin(req: Request, res: Response) {
+  const user = await getUserByEmail(req.body.email);
+  const isPasswordValid = await checkPasswordHash(
+    req.body.password,
+    user?.hashedPassword || "",
+  );
+  if (user && isPasswordValid) {
+    return res.status(200).json(stripPassword(user));
+  }
+  return res.status(401).json({ error: "Incorrect email or password" });
 }
