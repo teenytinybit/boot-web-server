@@ -10,4 +10,10 @@ class ChirpValidationError extends Error {
   }
 }
 
-export { NotFoundError, ChirpValidationError };
+class InvalidJWTError extends Error {
+  constructor() {
+    super("Invalid token");
+  }
+}
+
+export { NotFoundError, ChirpValidationError, InvalidJWTError };
