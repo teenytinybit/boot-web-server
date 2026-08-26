@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
-import { ChirpValidationError, NotFoundError } from "../errors.js";
 import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { NotFoundError } from "../errors.js";
+import { getBearerToken, validateJWT } from "../auth.js";
+import config from "../config.js";
 
 function maskProfanity(message: string) {
   const PROFANITIES = ["kerfuffle", "sharbert", "fornax"];
@@ -15,21 +17,16 @@ function maskProfanity(message: string) {
     .join(" ");
 }
 
-function validateLength(message: string) {
-  return message.length <= 140;
-}
-
 export async function handlerCreateChirp(req: Request, res: Response) {
-  if (!req.body) {
-    return res.status(400).json({ error: "Invalid JSON" });
+  const token = getBearerToken(req);
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
+  const userId = validateJWT(token, config.api.secret);
 
-  let { body, userId } = req.body;
-  if (!validateLength(body)) {
-    throw new ChirpValidationError();
-  }
-
+  let { body } = req.body;
   body = maskProfanity(body);
+
   const chirp = await createChirp({ body, userId });
   return res.status(201).json(chirp);
 }
@@ -41,7 +38,6 @@ export async function handlerGetChirps(req: Request, res: Response) {
 
 export async function handlerGetChirp(req: Request, res: Response) {
   const chirpId = req.params.chirpId as string;
-  console.log("whatafstdfastd");
   const chirp = await getChirpById(chirpId);
   if (!chirp) {
     console.log(`[NOT_FOUND]: Chirp id '${chirpId}' not found`);
