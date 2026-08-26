@@ -9,6 +9,7 @@ import { handlerReadiness } from "../handlers/readiness.js";
 import {
   handlerCreateUser,
   handlerLogin,
+  handlerPolkaWebhook,
   handlerRefresh,
   handlerRevoke,
   handlerUpdateUser,
@@ -30,6 +31,7 @@ apiRouter.put("/users", validateUpdateUser, handlerUpdateUser);
 apiRouter.post("/login", validateLoginUser, handlerLogin);
 apiRouter.post("/refresh", handlerRefresh);
 apiRouter.post("/revoke", handlerRevoke);
+apiRouter.post("/polka/webhooks", handlerPolkaWebhook);
 
 apiRouter.get("/chirps/:chirpId", handlerGetChirp);
 apiRouter.delete("/chirps/:chirpId", handlerDeleteChirp);

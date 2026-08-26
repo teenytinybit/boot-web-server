@@ -8,7 +8,7 @@ import {
   validateJWT,
 } from "../auth.js";
 import config from "../config.js";
-import { createUser, getUserByEmail, updateUser } from "../db/queries/users.js";
+import { createUser, getUserByEmail, getUserById, updateUser } from "../db/queries/users.js";
 import { User } from "../db/schema.js";
 import {
   createRefreshToken,
@@ -80,4 +80,30 @@ export async function handlerUpdateUser(req: Request, res: Response) {
   const hashedPassword = await hashPassword(password);
   const user = await updateUser(userId, { email, hashedPassword });
   return res.status(200).json(stripPassword(user));
+}
+
+export async function handlerPolkaWebhook(req: Request, res: Response) {
+  console.log("[POLKA WEBHOOK]: Processing event");
+  if (!req.body) {
+    return res.status(400).json({ error: "Invalid JSON" });
+  }
+
+  const { event, data } = req.body;
+  if (!event || !data) {
+    return res.status(400).json({ error: "Invalid JSON" });
+  }
+
+  console.log(event, data);
+  if (event !== "user.upgraded") {
+    return res.status(204).end();
+  }
+
+  const userId = data.userId;
+  const user = await getUserById(userId);
+  if (!user) {
+    return res.status(404).end();
+  }
+
+  await updateUser(userId, { isChirpyRed: true });
+  return res.status(204).end();
 }

@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../index.js";
 import { NewUser, User, users } from "../schema.js";
 
-type UpdateUser = Omit<User, "id" | "createdAt" | "updatedAt">;
+type UpdateUser = Partial<Omit<User, "id" | "createdAt" | "updatedAt">>;
 
 export async function createUser(user: NewUser) {
   const [result] = await db.insert(users).values(user).onConflictDoNothing().returning();
@@ -15,6 +15,11 @@ export async function resetUsers() {
 
 export async function getUserByEmail(email: string) {
   const [result] = await db.select().from(users).where(eq(users.email, email));
+  return result;
+}
+
+export async function getUserById(userId: string) {
+  const [result] = await db.select().from(users).where(eq(users.id, userId));
   return result;
 }
 
