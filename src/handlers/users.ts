@@ -1,21 +1,26 @@
 import { Request, Response } from "express";
-import { checkPasswordHash, hashPassword, makeJWT } from "../auth.js";
+import {
+  checkPasswordHash,
+  getBearerToken,
+  hashPassword,
+  makeJWT,
+  makeRefreshToken,
+} from "../auth.js";
 import config from "../config.js";
 import { createUser, getUserByEmail } from "../db/queries/users.js";
 import { User } from "../db/schema.js";
+import {
+  createRefreshToken,
+  getRefreshToken,
+  revokeRefreshToken,
+} from "../db/queries/refreshTokens.js";
 
-const DEFAULT_EXPITY_TIME_SEC = 3600; // 1 hour
+const ACCESS_TOKEN_EXP_SECONDS = 3600; // 1 hour
+const REFRESH_TOKEN_EXP_MILLISECONDS = 60 * 24 * 3600 * 1000; // 60 days
 
 function stripPassword(user: User): Omit<User, "hashedPassword"> {
   const { hashedPassword, ...userWithoutPassword } = user;
   return userWithoutPassword;
-}
-
-function getExpirationTime(expiresInSeconds: number | undefined) {
-  if (expiresInSeconds && expiresInSeconds <= DEFAULT_EXPITY_TIME_SEC) {
-    return expiresInSeconds;
-  }
-  return DEFAULT_EXPITY_TIME_SEC;
 }
 
 export async function handlerCreateUser(req: Request, res: Response) {
@@ -35,9 +40,34 @@ export async function handlerLogin(req: Request, res: Response) {
     user?.hashedPassword || "",
   );
   if (user && isPasswordValid) {
-    const expiry = getExpirationTime(req.body.expiresInSeconds);
-    const token = makeJWT(user.id, expiry, config.api.secret);
-    return res.status(200).json({ ...stripPassword(user), token });
+    const token = makeJWT(user.id, ACCESS_TOKEN_EXP_SECONDS, config.api.secret);
+    const refreshToken = makeRefreshToken();
+    await createRefreshToken({
+      token: refreshToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXP_MILLISECONDS),
+    });
+
+    return res.status(200).json({ ...stripPassword(user), token, refreshToken });
   }
   return res.status(401).json({ error: "Incorrect email or password" });
+}
+
+export async function handlerRefresh(req: Request, res: Response) {
+  const token = getBearerToken(req);
+  const refreshToken = await getRefreshToken(token);
+  if (refreshToken && !refreshToken.revokedAt && refreshToken.expiresAt > new Date()) {
+    const token = makeJWT(refreshToken.userId, ACCESS_TOKEN_EXP_SECONDS, config.api.secret);
+    return res.status(200).json({ token });
+  }
+  return res.status(401).json({ error: "Invalid token" });
+}
+
+export async function handlerRevoke(req: Request, res: Response) {
+  console.log("Revoking token");
+  const token = getBearerToken(req);
+  console.log(token);
+  await revokeRefreshToken(token);
+  console.log("Token revoked");
+  return res.status(204).end();
 }
