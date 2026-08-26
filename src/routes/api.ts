@@ -1,5 +1,10 @@
 import express from "express";
-import { handlerCreateChirp, handlerGetChirp, handlerGetChirps } from "../handlers/chirps.js";
+import {
+  handlerCreateChirp,
+  handlerDeleteChirp,
+  handlerGetChirp,
+  handlerGetChirps,
+} from "../handlers/chirps.js";
 import { handlerReadiness } from "../handlers/readiness.js";
 import {
   handlerCreateUser,
@@ -27,6 +32,7 @@ apiRouter.post("/refresh", handlerRefresh);
 apiRouter.post("/revoke", handlerRevoke);
 
 apiRouter.get("/chirps/:chirpId", handlerGetChirp);
+apiRouter.delete("/chirps/:chirpId", handlerDeleteChirp);
 apiRouter.get("/chirps", handlerGetChirps);
 apiRouter.post("/chirps", validateCreateChirp, handlerCreateChirp);
 
