@@ -5,9 +5,10 @@ import {
   hashPassword,
   makeJWT,
   makeRefreshToken,
+  validateJWT,
 } from "../auth.js";
 import config from "../config.js";
-import { createUser, getUserByEmail } from "../db/queries/users.js";
+import { createUser, getUserByEmail, updateUser } from "../db/queries/users.js";
 import { User } from "../db/schema.js";
 import {
   createRefreshToken,
@@ -70,4 +71,13 @@ export async function handlerRevoke(req: Request, res: Response) {
   await revokeRefreshToken(token);
   console.log("Token revoked");
   return res.status(204).end();
+}
+
+export async function handlerUpdateUser(req: Request, res: Response) {
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.api.secret);
+  const { email, password } = req.body;
+  const hashedPassword = await hashPassword(password);
+  const user = await updateUser(userId, { email, hashedPassword });
+  return res.status(200).json(stripPassword(user));
 }

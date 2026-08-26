@@ -6,14 +6,22 @@ import {
   handlerLogin,
   handlerRefresh,
   handlerRevoke,
+  handlerUpdateUser,
 } from "../handlers/users.js";
 import { validateCreateChirp } from "../validators/chirps.js";
-import { validateCreateUser, validateLoginUser } from "../validators/users.js";
+import {
+  validateCreateUser,
+  validateLoginUser,
+  validateUpdateUser,
+} from "../validators/users.js";
 
 const apiRouter = express.Router();
 
 apiRouter.get("/healthz", handlerReadiness);
+
 apiRouter.post("/users", validateCreateUser, handlerCreateUser);
+apiRouter.put("/users", validateUpdateUser, handlerUpdateUser);
+
 apiRouter.post("/login", validateLoginUser, handlerLogin);
 apiRouter.post("/refresh", handlerRefresh);
 apiRouter.post("/revoke", handlerRevoke);
