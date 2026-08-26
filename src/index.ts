@@ -3,7 +3,12 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import express, { NextFunction, Request, Response } from "express";
 import postgres from "postgres";
 import config from "./config.js";
-import { ChirpValidationError, InvalidJWTError, NotFoundError } from "./errors.js";
+import {
+  ApiKeyError,
+  ChirpValidationError,
+  InvalidJWTError,
+  NotFoundError,
+} from "./errors.js";
 import { middlewareLogResponses } from "./middleware/logger.js";
 import { middlewareMetricsInc } from "./middleware/metrics.js";
 import adminRouter from "./routes/admin.js";
@@ -27,7 +32,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     return res.status(404).json({ error: err.message });
   } else if (err instanceof ChirpValidationError) {
     return res.status(400).json({ error: err.message });
-  } else if (err instanceof InvalidJWTError) {
+  } else if (err instanceof InvalidJWTError || err instanceof ApiKeyError) {
     return res.status(401).json({ error: err.message });
   }
   res.status(500).json({ error: "Something went wrong on our end" });

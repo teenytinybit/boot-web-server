@@ -2,7 +2,7 @@ import * as argon2 from "argon2";
 import * as crypto from "node:crypto";
 import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { InvalidJWTError } from "./errors.js";
+import { ApiKeyError, InvalidJWTError } from "./errors.js";
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -38,4 +38,13 @@ export function getBearerToken(req: Request): string {
 
 export function makeRefreshToken(): string {
   return crypto.randomBytes(32).toString("hex");
+}
+
+export function getAPIKey(req: Request): string {
+  const authorizationHeader = req.get("Authorization");
+  if (!authorizationHeader || !authorizationHeader.startsWith("ApiKey ")) {
+    throw new ApiKeyError();
+  }
+  const key = authorizationHeader.split("ApiKey ")?.[1];
+  return key;
 }

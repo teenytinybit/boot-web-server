@@ -16,4 +16,10 @@ class InvalidJWTError extends Error {
   }
 }
 
-export { NotFoundError, ChirpValidationError, InvalidJWTError };
+class ApiKeyError extends Error {
+  constructor() {
+    super("Invalid API key");
+  }
+}
+
+export { NotFoundError, ChirpValidationError, InvalidJWTError, ApiKeyError };

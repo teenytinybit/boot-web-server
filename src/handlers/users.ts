@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   checkPasswordHash,
+  getAPIKey,
   getBearerToken,
   hashPassword,
   makeJWT,
@@ -15,6 +16,7 @@ import {
   getRefreshToken,
   revokeRefreshToken,
 } from "../db/queries/refreshTokens.js";
+import { ApiKeyError } from "../errors.js";
 
 const ACCESS_TOKEN_EXP_SECONDS = 3600; // 1 hour
 const REFRESH_TOKEN_EXP_MILLISECONDS = 60 * 24 * 3600 * 1000; // 60 days
@@ -84,6 +86,10 @@ export async function handlerUpdateUser(req: Request, res: Response) {
 
 export async function handlerPolkaWebhook(req: Request, res: Response) {
   console.log("[POLKA WEBHOOK]: Processing event");
+  const apiKey = getAPIKey(req);
+  if (apiKey !== config.api.polkaKey) {
+    throw new ApiKeyError();
+  }
   if (!req.body) {
     return res.status(400).json({ error: "Invalid JSON" });
   }

@@ -12,6 +12,7 @@ type APIConfig = {
   fileserverHits: number;
   platform: string;
   secret: string;
+  polkaKey: string;
 };
 
 type Config = {
@@ -23,6 +24,7 @@ const apiConfig: APIConfig = {
   fileserverHits: 0,
   platform: envOrThrow("PLATFORM"),
   secret: envOrThrow("JWT_SECRET"),
+  polkaKey: envOrThrow("POLKA_KEY"),
 };
 const migrationConfig: MigrationConfig = { migrationsFolder: "./src/db/migrations" };
 
