@@ -11,6 +11,7 @@ type DBConfig = {
 type APIConfig = {
   fileserverHits: number;
   platform: string;
+  secret: string;
 };
 
 type Config = {
@@ -18,7 +19,11 @@ type Config = {
   db: DBConfig;
 };
 
-const apiConfig: APIConfig = { fileserverHits: 0, platform: envOrThrow("PLATFORM") };
+const apiConfig: APIConfig = {
+  fileserverHits: 0,
+  platform: envOrThrow("PLATFORM"),
+  secret: envOrThrow("JWT_SECRET"),
+};
 const migrationConfig: MigrationConfig = { migrationsFolder: "./src/db/migrations" };
 
 const config: Config = {

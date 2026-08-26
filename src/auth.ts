@@ -1,4 +1,5 @@
 import * as argon2 from "argon2";
+import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { InvalidJWTError } from "./errors.js";
 
@@ -23,4 +24,13 @@ export function hashPassword(password: string): Promise<string> {
 
 export function checkPasswordHash(password: string, hash: string): Promise<boolean> {
   return argon2.verify(hash, password);
+}
+
+export function getBearerToken(req: Request): string {
+  const authorizationHeader = req.get("Authorization");
+  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+    throw new InvalidJWTError();
+  }
+  const token = authorizationHeader.split("Bearer ")?.[1];
+  return token;
 }
