@@ -40,6 +40,9 @@ export async function handlerCreateChirp(req: Request, res: Response) {
 export async function handlerGetChirps(req: Request, res: Response) {
   let authorId = (req.query.authorId as string) || ""; // we pre-validate string type in the validator middleware
   const chirps = await (authorId ? getChirpsByUserId(authorId) : getAllChirps());
+  if (req.query.sort === "desc") {
+    chirps.reverse();
+  }
   return res.status(200).json(chirps);
 }
 

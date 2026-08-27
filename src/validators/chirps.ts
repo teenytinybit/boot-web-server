@@ -26,6 +26,9 @@ export function validateGetChirps(req: Request, res: Response, next: NextFunctio
   if (req.query.authorId && typeof req.query.authorId !== "string") {
     throw new ValidationError("Invalid query");
   }
+  if (req.query.sort && typeof req.query.sort !== "string") {
+    throw new ValidationError("Invalid query");
+  }
 
   next();
 }
