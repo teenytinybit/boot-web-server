@@ -5,7 +5,7 @@ import postgres from "postgres";
 import config from "./config.js";
 import {
   ApiKeyError,
-  ChirpValidationError,
+  ValidationError,
   InvalidJWTError,
   NotFoundError,
 } from "./errors.js";
@@ -30,7 +30,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.log(err.stack);
   if (err instanceof NotFoundError) {
     return res.status(404).json({ error: err.message });
-  } else if (err instanceof ChirpValidationError) {
+  } else if (err instanceof ValidationError) {
     return res.status(400).json({ error: err.message });
   } else if (err instanceof InvalidJWTError || err instanceof ApiKeyError) {
     return res.status(401).json({ error: err.message });

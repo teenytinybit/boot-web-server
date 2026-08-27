@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ChirpValidationError } from "../errors.js";
+import { ValidationError } from "../errors.js";
 
 function validateLength(message: string) {
   return message.length <= 140;
@@ -16,7 +16,15 @@ export function validateCreateChirp(req: Request, res: Response, next: NextFunct
   }
 
   if (!validateLength(body)) {
-    throw new ChirpValidationError();
+    throw new ValidationError("Chirp is too long. Max length is 140");
+  }
+
+  next();
+}
+
+export function validateGetChirps(req: Request, res: Response, next: NextFunction) {
+  if (req.query.authorId && typeof req.query.authorId !== "string") {
+    throw new ValidationError("Invalid query");
   }
 
   next();

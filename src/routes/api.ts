@@ -14,7 +14,7 @@ import {
   handlerRevoke,
   handlerUpdateUser,
 } from "../handlers/users.js";
-import { validateCreateChirp } from "../validators/chirps.js";
+import { validateCreateChirp, validateGetChirps } from "../validators/chirps.js";
 import {
   validateCreateUser,
   validateLoginUser,
@@ -35,7 +35,7 @@ apiRouter.post("/polka/webhooks", handlerPolkaWebhook);
 
 apiRouter.get("/chirps/:chirpId", handlerGetChirp);
 apiRouter.delete("/chirps/:chirpId", handlerDeleteChirp);
-apiRouter.get("/chirps", handlerGetChirps);
+apiRouter.get("/chirps", validateGetChirps, handlerGetChirps);
 apiRouter.post("/chirps", validateCreateChirp, handlerCreateChirp);
 
 export default apiRouter;

@@ -4,9 +4,9 @@ class NotFoundError extends Error {
   }
 }
 
-class ChirpValidationError extends Error {
-  constructor() {
-    super("Chirp is too long. Max length is 140");
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
   }
 }
 
@@ -22,4 +22,4 @@ class ApiKeyError extends Error {
   }
 }
 
-export { NotFoundError, ChirpValidationError, InvalidJWTError, ApiKeyError };
+export { NotFoundError, ValidationError, InvalidJWTError, ApiKeyError };

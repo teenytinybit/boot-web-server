@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { createChirp, deleteChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import {
+  createChirp,
+  deleteChirp,
+  getAllChirps,
+  getChirpById,
+  getChirpsByUserId,
+} from "../db/queries/chirps.js";
 import { NotFoundError } from "../errors.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import config from "../config.js";
@@ -32,7 +38,8 @@ export async function handlerCreateChirp(req: Request, res: Response) {
 }
 
 export async function handlerGetChirps(req: Request, res: Response) {
-  const chirps = await getAllChirps();
+  let authorId = (req.query.authorId as string) || ""; // we pre-validate string type in the validator middleware
+  const chirps = await (authorId ? getChirpsByUserId(authorId) : getAllChirps());
   return res.status(200).json(chirps);
 }
 
